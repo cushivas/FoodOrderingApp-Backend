@@ -29,7 +29,7 @@ import org.springframework.lang.NonNull;
 @Entity
 @Table(name = "customer_auth")
 @NamedQueries({
-		@NamedQuery(name = "customerAuthTokenByAccessToken", query = "select ct from CustomerAuthEntity where ct.accessToken = :accessToken") })
+		@NamedQuery(name = "customerAuthTokenByAccessToken", query = "select ct from CustomerAuthEntity ct where ct.accessToken = :accessToken") })
 public class CustomerAuthEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -58,8 +58,7 @@ public class CustomerAuthEntity implements Serializable {
 	@NotNull
 	private ZonedDateTime loginAt;
 
-	@Column(name = "login_out")
-	@NotNull
+	@Column(name = "logout_at")
 	private ZonedDateTime loginOut;
 
 	@Column(name = "expires_at")
@@ -70,20 +69,6 @@ public class CustomerAuthEntity implements Serializable {
 
 	public CustomerAuthEntity() {
 
-	}
-
-	// Initialized constructor
-
-	public CustomerAuthEntity(long id, @Size(max = 200) String uuid, CustomerEntity customer,
-			@Size(max = 500) @NotNull String accessToken, @NotNull ZonedDateTime loginAt,
-			@NotNull ZonedDateTime loginOut, @NotNull ZonedDateTime expiresAt) {
-		this.id = id;
-		this.uuid = uuid;
-		this.customer = customer;
-		this.accessToken = accessToken;
-		this.loginAt = loginAt;
-		this.loginOut = loginOut;
-		this.expiresAt = expiresAt;
 	}
 
 	/*

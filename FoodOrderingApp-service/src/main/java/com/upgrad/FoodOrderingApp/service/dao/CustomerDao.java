@@ -29,7 +29,7 @@ public class CustomerDao {
 		}
 	}
 
-	public CustomerAuthEntity createAuthenticationToken(CustomerAuthEntity customerAuthEntity) {
+	public CustomerAuthEntity createAuthenticationToken(final CustomerAuthEntity customerAuthEntity) {
 		this.entityManager.persist(customerAuthEntity);
 		return customerAuthEntity;
 	}
