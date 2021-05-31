@@ -19,11 +19,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.*;
 
 @Entity
 @Table(name = "customer")
@@ -67,11 +63,13 @@ public class CustomerEntity implements Serializable {
 	@Column(name = "password")
 	@Size(max = 255)
 	@NotNull
+	@ToStringExclude
 	private String password;
 
 	@Column(name = "salt")
 	@Size(max = 255)
 	@NotNull
+	@ToStringExclude
 	private String salt;
 
 	// No-argument Constructor for empty initializing
