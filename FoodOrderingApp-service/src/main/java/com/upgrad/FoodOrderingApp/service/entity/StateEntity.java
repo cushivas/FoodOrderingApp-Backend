@@ -1,14 +1,8 @@
 package com.upgrad.FoodOrderingApp.service.entity;
-/**
- * @author soniya kocher
- *
- * This class is state entity class
- */
-
-import javax.persistence.*;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -17,6 +11,7 @@ import java.io.Serializable;
 @Table(name = "state")
 @NamedQueries(
         {
+
                 @NamedQuery(name = "allStates", query = "select s from StateEntity s"),
                 @NamedQuery(name = "stateByUuid",query="select s from StateEntity s where s.uuid=:uuid")
         }
@@ -25,16 +20,22 @@ import java.io.Serializable;
 public class StateEntity implements Serializable {
 
     @Id
-    @Column(name = "ID")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "UUID")
+    @Column(name = "uuid")
+
+
+        }
+)
+
     @NotNull
     @Size(max = 200)
     private String uuid;
 
-    @Column(name = "STATE_NAME")
+
+    @Column(name = "state_name")
     @Size(max = 30)
     private String stateName;
 
@@ -45,7 +46,6 @@ public class StateEntity implements Serializable {
         this.uuid = uuid;
         this.stateName = stateName;
     }
-
     public Long getId() {
         return id;
     }
@@ -81,3 +81,4 @@ public class StateEntity implements Serializable {
     }
 
 }
+

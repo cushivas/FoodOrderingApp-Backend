@@ -11,18 +11,20 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
+
 @Entity
 @Table(name = "address")
 @NamedQueries(
         {
+
                 @NamedQuery(name = "addressByUuid", query = "select a from AddressEntity a where a.uuid =:uuid")
+
         }
 )
 
 public class AddressEntity implements Serializable {
 
     @Id
-    @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
@@ -30,26 +32,28 @@ public class AddressEntity implements Serializable {
     @Size(max = 200)
     private String uuid;
 
-    @Column(name = "FLAT_BUIL_NUMBER")
+
+    @Column(name = "flat_buil_number")
     @Size(max = 255)
     private String flatBuildingNumber;
 
-    @Column(name = "LOCALITY")
+    @Column(name = "locality")
     @Size(max = 255)
     private String locality;
 
-    @Column(name = "CITY")
+    @Column(name = "city")
     @Size(max = 30)
     private String city;
 
-    @Column(name = "PINCODE")
+    @Column(name = "pincode")
+
     @Size(max = 30)
     private String pincode;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "STATE_ID")
-    private StateEntity state;
+     @JoinColumn(name = "state_id")
+  private StateEntity state;
 
     @Column(name = "active")
     private Integer active;
@@ -117,4 +121,8 @@ public class AddressEntity implements Serializable {
     public void setActive(Integer active) {
         this.active = active;
     }
+
+
+
 }
+
