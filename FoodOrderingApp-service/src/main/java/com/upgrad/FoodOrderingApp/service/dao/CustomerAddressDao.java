@@ -19,6 +19,10 @@ public class CustomerAddressDao {
 	@PersistenceContext
 	private EntityManager entityManager;
 
+	public void createCustomerAddress(CustomerAddressEntity customerAddressEntity) {
+		entityManager.persist(customerAddressEntity);
+	}
+
 	public CustomerAddressEntity getCustomerAddressByAddressId(AddressEntity addressEntity) {
 		try {
 			return this.entityManager.createNamedQuery("customerAddressByAddressId", CustomerAddressEntity.class)
