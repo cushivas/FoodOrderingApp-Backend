@@ -1,4 +1,4 @@
-/*package com.upgrad.FoodOrderingApp.api.controller;
+package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.upgrad.FoodOrderingApp.api.model.AddressList;
@@ -27,6 +27,8 @@ import java.util.Collections;
 import java.util.UUID;
 
 import static org.junit.Assert.assertNull;
+
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -185,7 +187,7 @@ public class AddressControllerTest {
 
     // ------------------------------------------ DELETE /address/{address_id} ------------------------------------------
 
-    //This test case passes when you can successfully delete an address.
+//    //This test case passes when you can successfully delete an address.
     @Test
     public void shouldDeleteAddress() throws Exception {
         final CustomerEntity customerEntity = new CustomerEntity();
@@ -305,9 +307,9 @@ public class AddressControllerTest {
         verify(mockAddressService, times(0)).deleteAddress(any());
     }
 
-    // ------------------------------------------ GET /address/customer ------------------------------------------
-
-    //This test case passes when you are able to retrieve all the saved address of a customer.
+//    // ------------------------------------------ GET /address/customer ------------------------------------------
+//
+//    //This test case passes when you are able to retrieve all the saved address of a customer.
     @Test
     public void shouldGetAllAddresses() throws Exception {
         final CustomerEntity customerEntity = new CustomerEntity();
@@ -319,7 +321,7 @@ public class AddressControllerTest {
         addressEntity.setPincode("100000");
         addressEntity.setCity("city");
         addressEntity.setLocality("locality");
-        addressEntity.setFlatBuilNo("flatBuildNo");
+        addressEntity.setFlatBuildingNumber("flatBuildNo");
         final String stateUuid = UUID.randomUUID().toString();
         addressEntity.setState(new StateEntity(stateUuid, "state"));
         when(mockAddressService.getAllAddress(customerEntity)).thenReturn(Collections.singletonList(addressEntity));
@@ -397,9 +399,9 @@ public class AddressControllerTest {
         verify(mockAddressService, times(0)).getAllAddress(any());
     }
 
-    // ------------------------------------------ GET /states ------------------------------------------
-
-    //This test case passes when you are able to fetch the list of all available states.
+//    // ------------------------------------------ GET /states ------------------------------------------
+//
+//    //This test case passes when you are able to fetch the list of all available states.
     @Test
     public void shouldGetAllStates() throws Exception {
         final String stateUuid = UUID.randomUUID().toString();
@@ -434,4 +436,3 @@ public class AddressControllerTest {
     }
 }
 
- */
