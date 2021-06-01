@@ -25,11 +25,6 @@ public class StateEntity implements Serializable {
     private Long id;
 
     @Column(name = "uuid")
-
-
-        }
-)
-
     @NotNull
     @Size(max = 200)
     private String uuid;
