@@ -8,7 +8,9 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
-//This Class is created to access DB with respect to Category entity
+/**
+ *  Data Access Object to access db for category operation..
+ */
 
 @Repository
 public class CategoryDao {
@@ -17,7 +19,11 @@ public class CategoryDao {
     private EntityManager entityManager;
 
 
-    //To get category by the id if no result it returns null.
+    /**
+     *  Get Category by UUID..
+     * @param uuid
+     * @return
+     */
     public CategoryEntity getCategoryByUuid(String uuid) {
         try {
             CategoryEntity categoryEntity = entityManager.createNamedQuery("getCategoryByUuid",CategoryEntity.class).setParameter("uuid",uuid).getSingleResult();
@@ -27,7 +33,10 @@ public class CategoryDao {
         }
     }
 
-    //To get list categories  from the db if no result it returns null.
+    /**
+     *  Get all the categories from db..
+     * @return
+     */
     public List<CategoryEntity> getAllCategoriesOrderedByName() {
         try {
             List<CategoryEntity> categoryEntities = entityManager.createNamedQuery("getAllCategoriesOrderedByName",CategoryEntity.class).getResultList();
