@@ -6,8 +6,7 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 @Entity
 @Table(name = "item",uniqueConstraints = {@UniqueConstraint(columnNames = {"uuid"})})
-@NamedQueries({
-        @NamedQuery(name = "getItemByUUID",query = "SELECT i FROM ItemEntity i WHERE i.uuid = :uuid"),
+@NamedQueries({@NamedQuery(name = "getItemByUUID",query = "SELECT i FROM ItemEntity i WHERE i.uuid = :uuid"),
 })
 public class ItemEntity implements Serializable {
 
@@ -38,6 +37,7 @@ public class ItemEntity implements Serializable {
     @NotNull
     private ItemType type;
 
+
     public Integer getId() {
         return id;
     }
@@ -54,7 +54,7 @@ public class ItemEntity implements Serializable {
         this.uuid = uuid;
     }
 
-    public String getitemName() {
+    public String getItemName() {
         return itemName;
     }
 

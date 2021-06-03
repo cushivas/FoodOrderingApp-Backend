@@ -1,43 +1,27 @@
 package com.upgrad.FoodOrderingApp.service.entity;
 
-/**
- * @author soniya kocher
- * <p>
- * This class is Order entity class
- */
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
 @NamedQueries({
-        @NamedQuery(
-                name = "allOrdersByAddress",
-                query = "select o from OrderEntity o where o.address=:address")})
+        @NamedQuery(name = "allOrdersByAddress", query = "select o from OrderEntity o where o.address=:address"),
+        @NamedQuery(name = "getOrdersByCustomer", query = "select o from OrderEntity o where o.customer.uuid=:customerUUID order by o.date desc")})
+
 public class OrderEntity implements Serializable {
 
     @Id
@@ -55,6 +39,10 @@ public class OrderEntity implements Serializable {
     private Double bill;
 
 
+    @ManyToOne
+    @JoinColumn(name = "coupon_id")
+    private CouponEntity coupon;
+
     @NotNull
     @Column(name = "discount")
     private Double discount;
@@ -63,16 +51,52 @@ public class OrderEntity implements Serializable {
     @Column(name = "date")
     private ZonedDateTime date;
 
+    @ManyToOne
+    @JoinColumn(name = "address_id")
+    private AddressEntity address;
+
+
+    @ManyToOne
+    @JoinColumn(name = "payment_id")
+    private PaymentEntity payment;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    private List<OrderItemEntity> orderItems = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private CustomerEntity customer;
 
-    @ManyToOne
-    @JoinColumn(name = "address_id")
-    private AddressEntity address;
 
+    @ManyToOne
+    @JoinColumn(name = "restaurant_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private RestaurantEntity restaurant;
+
+    public OrderEntity() {
+    }
+
+    public OrderEntity(
+            @NotNull @Size(max = 200) String uuid,
+            @NotNull Double bill,
+            CouponEntity coupon,
+            @NotNull Double discount,
+            @NotNull Date date,
+            PaymentEntity payment,
+            CustomerEntity customerEntity,
+            AddressEntity address,
+            RestaurantEntity restaurant) {
+        this.uuid = uuid;
+        this.bill = bill;
+        this.coupon = coupon;
+        this.discount = discount;
+        this.date = date.toInstant().atZone(ZoneId.systemDefault());
+        this.payment = payment;
+        this.customer = customerEntity;
+        this.address = address;
+        this.restaurant = restaurant;
+    }
 
     public Integer getId() {
         return id;
@@ -132,6 +156,37 @@ public class OrderEntity implements Serializable {
         this.address = address;
     }
 
+    public List<OrderItemEntity> getOrderItems() {
+        return orderItems;
+    }
+
+    public void setOrderItems(List<OrderItemEntity> orderItems) {
+        this.orderItems = orderItems;
+    }
+
+    public RestaurantEntity getRestaurant() {
+        return restaurant;
+    }
+
+    public void setRestaurant(RestaurantEntity restaurant) {
+        this.restaurant = restaurant;
+    }
+
+    public CouponEntity getCoupon() {
+        return coupon;
+    }
+
+    public void setCoupon(CouponEntity coupon) {
+        this.coupon = coupon;
+    }
+
+    public PaymentEntity getPayment() {
+        return payment;
+    }
+
+    public void setPayment(PaymentEntity payment) {
+        this.payment = payment;
+    }
 
     @Override
     public boolean equals(Object obj) {
