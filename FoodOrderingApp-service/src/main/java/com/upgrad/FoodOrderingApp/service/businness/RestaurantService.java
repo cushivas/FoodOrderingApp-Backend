@@ -35,11 +35,23 @@ public class RestaurantService {
     @Autowired
     Utility utility;
 
+    /**
+     *  This method returns list of all restaurants by Id.
+     * @return
+     */
+
     public List<RestaurantEntity> restaurantsByRating(){
 
         List<RestaurantEntity> restaurantEntities = restaurantDao.restaurantsByRating();
         return restaurantEntities;
     }
+
+    /**
+     *  Get the list of restaurants by value entered by user
+     * @param restaurantName resturant name
+     * @return List of restaurant entity
+     * @throws RestaurantNotFoundException throws when no restaurant found with given name
+     */
 
     public List<RestaurantEntity> restaurantsByName(String restaurantName)throws RestaurantNotFoundException{
         if(restaurantName == null || restaurantName ==""){ //Checking for restaunrant name to be null or empty to throw exception.
@@ -49,6 +61,13 @@ public class RestaurantService {
         List<RestaurantEntity> restaurantEntities = restaurantDao.restaurantsByName(restaurantName);
         return restaurantEntities;
     }
+
+    /**
+     * Get the restaurant entity list by restaurant category id.
+     * @param categoryId
+     * @return
+     * @throws CategoryNotFoundException when category entered by user is not found.
+     */
 
     public List<RestaurantEntity> restaurantByCategory(String categoryId) throws CategoryNotFoundException {
 
@@ -71,6 +90,13 @@ public class RestaurantService {
         return restaurantEntities;
     }
 
+    /**
+     *  Get restaurant details by restaurant uuid..
+     * @param restaurantUuid
+     * @return
+     * @throws RestaurantNotFoundException when restaurant is not found with given id..
+     */
+
     public RestaurantEntity restaurantByUUID(String restaurantUuid)throws RestaurantNotFoundException{
         if(restaurantUuid == null||restaurantUuid == ""){
             throw new RestaurantNotFoundException("RNF-002","Restaurant id field should not be empty");
@@ -84,6 +110,14 @@ public class RestaurantService {
 
         return restaurantEntity;
     }
+
+    /**
+     * Patch method for updating restaurant rating
+     * @param restaurantEntity
+     * @param customerRating
+     * @return
+     * @throws InvalidRatingException when user enters invalid raring number
+     */
 
     @Transactional(propagation = Propagation.REQUIRED)
     public RestaurantEntity updateRestaurantRating(RestaurantEntity restaurantEntity, Double customerRating) throws InvalidRatingException {
