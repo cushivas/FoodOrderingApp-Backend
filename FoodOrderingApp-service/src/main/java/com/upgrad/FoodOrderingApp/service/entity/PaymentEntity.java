@@ -1,90 +1,60 @@
-
 package com.upgrad.FoodOrderingApp.service.entity;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "payment")
-@NamedQueries({
-        @NamedQuery(name = "getAllPaymentMethods", query = "select p from PaymentEntity p"),
-        @NamedQuery(name = "getPaymentByUUID", query = "select p from PaymentEntity p where p.uuid=:paymentUUID")
-})
+@Table(name = "payment", uniqueConstraints = { @UniqueConstraint(columnNames = { "uuid" }) })
+@NamedQueries({ @NamedQuery(name = "getPaymentByUUID", query = "SELECT p FROM PaymentEntity p WHERE p.uuid = :uuid"),
+		@NamedQuery(name = "getAllPaymentMethods", query = "SELECT p FROM PaymentEntity p") })
 public class PaymentEntity implements Serializable {
 
-    @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+	@Id
+	@Column(name = "id")
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Integer id;
 
-    @Column(name = "uuid", unique = true)
-    @NotNull
-    @Size(max = 200)
-    private String uuid;
+	@Column(name = "uuid")
+	@Size(max = 200)
+	@NotNull
+	private String uuid;
 
-    @Column(name = "payment_name")
-    @NotNull
-    @Size(max = 255)
-    private String paymentName;
+	@Column(name = "payment_name")
+	@Size(max = 255)
+	private String paymentName;
 
-    public PaymentEntity() {
-    }
+	public PaymentEntity() {
 
-    public PaymentEntity(
-            @NotNull @Size(max = 200) String uuid, @NotNull @Size(max = 255) String paymentName) {
-        this.uuid = uuid;
-        this.paymentName = paymentName;
-    }
+	}
 
-    public Integer getId() {
-        return id;
-    }
+	public PaymentEntity(String uuid, String paymentName) {
+		this.uuid = uuid;
+		this.paymentName = paymentName;
+	}
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	public Integer getId() {
+		return id;
+	}
 
-    public String getUuid() {
-        return uuid;
-    }
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
+	public String getUuid() {
+		return uuid;
+	}
 
-    public String getPaymentName() {
-        return paymentName;
-    }
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
 
-    public void setPaymentName(String paymentName) {
-        this.paymentName = paymentName;
-    }
+	public String getPaymentName() {
+		return paymentName;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        return new EqualsBuilder().append(this, obj).isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder().append(this).hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
-    }
+	public void setPaymentName(String paymentName) {
+		this.paymentName = paymentName;
+	}
 }
