@@ -19,68 +19,54 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.lang.NonNull;
+
+//This Class represents the CustomerAuth table in the DB.
 
 @Entity
-@Table(name = "customer_auth")
+@Table(name = "customer_auth", uniqueConstraints = { @UniqueConstraint(columnNames = { "uuid" }) })
 @NamedQueries({
-		@NamedQuery(name = "customerAuthTokenByAccessToken", query = "select ct from CustomerAuthEntity ct where ct.accessToken = :accessToken") })
+		@NamedQuery(name = "getCustomerAuthByAccessToken", query = "SELECT c from CustomerAuthEntity c where c.accessToken = :access_Token"), })
 public class CustomerAuthEntity implements Serializable {
-
-	private static final long serialVersionUID = 1L;
 
 	@Id
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private Integer id;
 
 	@Column(name = "uuid")
 	@Size(max = 200)
-	@NonNull
+	@NotNull
 	private String uuid;
 
-	@ManyToOne
-	@OnDelete(action = OnDeleteAction.CASCADE)
+	@ManyToOne()
 	@JoinColumn(name = "customer_id")
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	private CustomerEntity customer;
 
 	@Column(name = "access_token")
 	@Size(max = 500)
-	@NotNull
 	private String accessToken;
 
 	@Column(name = "login_at")
-	@NotNull
 	private ZonedDateTime loginAt;
 
 	@Column(name = "logout_at")
-	private ZonedDateTime loginOut;
+	private ZonedDateTime logoutAt;
 
 	@Column(name = "expires_at")
-	@NotNull
 	private ZonedDateTime expiresAt;
 
-	// No-argument Constructor for empty initializing
-
-	public CustomerAuthEntity() {
-
+	public Integer getId() {
+		return this.id;
 	}
 
-	/*
-	 * Getters and Setters method to fetch and store the information in the
-	 * databases
-	 */
-
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -116,12 +102,12 @@ public class CustomerAuthEntity implements Serializable {
 		this.loginAt = loginAt;
 	}
 
-	public ZonedDateTime getLoginOut() {
-		return loginOut;
+	public ZonedDateTime getLogoutAt() {
+		return logoutAt;
 	}
 
-	public void setLoginOut(ZonedDateTime loginOut) {
-		this.loginOut = loginOut;
+	public void setLogoutAt(ZonedDateTime logoutAt) {
+		this.logoutAt = logoutAt;
 	}
 
 	public ZonedDateTime getExpiresAt() {
@@ -131,5 +117,4 @@ public class CustomerAuthEntity implements Serializable {
 	public void setExpiresAt(ZonedDateTime expiresAt) {
 		this.expiresAt = expiresAt;
 	}
-
 }
