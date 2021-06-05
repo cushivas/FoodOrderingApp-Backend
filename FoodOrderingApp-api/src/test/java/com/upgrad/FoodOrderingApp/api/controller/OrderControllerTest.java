@@ -1,4 +1,4 @@
-/*
+
 
 package com.upgrad.FoodOrderingApp.api.controller;
 
@@ -6,6 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.upgrad.FoodOrderingApp.api.model.CustomerOrderResponse;
 import com.upgrad.FoodOrderingApp.api.model.ItemQuantity;
 import com.upgrad.FoodOrderingApp.api.model.SaveOrderRequest;
+import com.upgrad.FoodOrderingApp.service.businness.AddressService;
+import com.upgrad.FoodOrderingApp.service.businness.CustomerService;
+import com.upgrad.FoodOrderingApp.service.businness.OrderService;
+import com.upgrad.FoodOrderingApp.service.businness.RestaurantService;
+import com.upgrad.FoodOrderingApp.service.entity.*;
 import com.upgrad.FoodOrderingApp.service.exception.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,7 +33,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import static org.junit.Assert.assertEquals;
 // This class contains all the test cases regarding the order controller
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -43,8 +48,8 @@ public class OrderControllerTest {
     @MockBean
     private CustomerService mockCustomerService;
 
-    @MockBean
-    private PaymentService mockPaymentService;
+//    @MockBean
+//    private PaymentService mockPaymentService;
 
     @MockBean
     private AddressService mockAddressService;
@@ -52,302 +57,302 @@ public class OrderControllerTest {
     @MockBean
     private RestaurantService mockRestaurantService;
 
-    @MockBean
-    private ItemService mockItemService;
+//    @MockBean
+//    private ItemService mockItemService;
 
     // ------------------------------------------ POST /order ------------------------------------------
 
     //This test case passes when you are able to save order successfully.
-    @Test
-    public void shouldSaveOrder() throws Exception {
-        final CustomerEntity customerEntity = new CustomerEntity();
-        final String customerId = UUID.randomUUID().toString();
-        customerEntity.setUuid(customerId);
-        when(mockCustomerService.getCustomer("database_accesstoken2"))
-                .thenReturn(customerEntity);
-
-        final SaveOrderRequest saveOrderRequest = getSaveOrderRequest();
-        when(mockPaymentService.getPaymentByUUID(saveOrderRequest.getPaymentId().toString()))
-                .thenReturn(new PaymentEntity());
-        when(mockAddressService.getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity))
-                .thenReturn(new AddressEntity());
-        when(mockRestaurantService.restaurantByUUID(saveOrderRequest.getRestaurantId().toString()))
-                .thenReturn(new RestaurantEntity());
-        when(mockOrderService.getCouponByCouponId(saveOrderRequest.getCouponId().toString()))
-                .thenReturn(new CouponEntity());
-
-        final OrderEntity orderEntity = new OrderEntity();
-        final String orderId = UUID.randomUUID().toString();
-        orderEntity.setUuid(orderId);
-        when(mockOrderService.saveOrder(any())).thenReturn(orderEntity);
-        when(mockOrderService.saveOrderItem(any())).thenReturn(new OrderItemEntity());
-
-        mockMvc
-                .perform(post("/order")
-                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                        .header("authorization", "Bearer database_accesstoken2")
-                        .content(new ObjectMapper().writeValueAsString(saveOrderRequest)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("id").value(orderId));
-        verify(mockCustomerService, times(1))
-                .getCustomer("database_accesstoken2");
-        verify(mockPaymentService, times(1))
-                .getPaymentByUUID(saveOrderRequest.getPaymentId().toString());
-        verify(mockAddressService, times(1))
-                .getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity);
-        verify(mockRestaurantService, times(1))
-                .restaurantByUUID(saveOrderRequest.getRestaurantId().toString());
-        verify(mockOrderService, times(1))
-                .getCouponByCouponId(saveOrderRequest.getCouponId().toString());
-        verify(mockOrderService, times(1)).saveOrder(any());
-        verify(mockOrderService, times(1)).saveOrderItem(any());
-    }
-
-    //This test case passes when you have handled the exception of trying to save an order while you are not logged  in.
-    @Test
-    public void shouldNotSaveOrderIfCustomerIsNotLoggedIn() throws Exception {
-        when(mockCustomerService.getCustomer("invalid_auth"))
-                .thenThrow(new AuthorizationFailedException("ATHR-001", "Customer is not Logged in."));
-
-        mockMvc
-                .perform(post("/order")
-                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                        .header("authorization", "Bearer invalid_auth")
-                        .content(new ObjectMapper().writeValueAsString(getSaveOrderRequest())))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("code").value("ATHR-001"));
-
-        verify(mockCustomerService, times(1)).getCustomer("invalid_auth");
-        verify(mockPaymentService, times(0)).getPaymentByUUID(anyString());
-        verify(mockAddressService, times(0)).getAddressByUUID(anyString(), any());
-        verify(mockRestaurantService, times(0)).restaurantByUUID(anyString());
-        verify(mockOrderService, times(0)).getCouponByCouponId(anyString());
-        verify(mockOrderService, times(0)).saveOrder(any());
-        verify(mockOrderService, times(0)).saveOrderItem(any());
-    }
-
-    //This test case passes when you have handled the exception of trying to save an order while you are already logged out.
-    @Test
-    public void shouldNotSaveOrderIfCustomerIsLoggedOut() throws Exception {
-        when(mockCustomerService.getCustomer("invalid_auth"))
-                .thenThrow(new AuthorizationFailedException("ATHR-002", "Customer is logged out. Log in again to access this endpoint."));
-        mockMvc
-                .perform(post("/order")
-                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                        .header("authorization", "Bearer invalid_auth")
-                        .content(new ObjectMapper().writeValueAsString(getSaveOrderRequest())))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("code").value("ATHR-002"));
-
-        verify(mockCustomerService, times(1)).getCustomer("invalid_auth");
-        verify(mockPaymentService, times(0)).getPaymentByUUID(anyString());
-        verify(mockAddressService, times(0)).getAddressByUUID(anyString(), any());
-        verify(mockRestaurantService, times(0)).restaurantByUUID(anyString());
-        verify(mockOrderService, times(0)).getCouponByCouponId(anyString());
-        verify(mockOrderService, times(0)).saveOrder(any());
-        verify(mockOrderService, times(0)).saveOrderItem(any());
-    }
-
-    //This test case passes when you have handled the exception of trying to save an order while your session is
-    // already expired.
-    @Test
-    public void shouldNotSaveOrderIfCustomerSessionIsExpired() throws Exception {
-        when(mockCustomerService.getCustomer("invalid_auth"))
-                .thenThrow(new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint."));
-        mockMvc
-                .perform(post("/order")
-                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                        .header("authorization", "Bearer invalid_auth")
-                        .content(new ObjectMapper().writeValueAsString(getSaveOrderRequest())))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("code").value("ATHR-003"));
-
-        verify(mockCustomerService, times(1)).getCustomer("invalid_auth");
-        verify(mockPaymentService, times(0)).getPaymentByUUID(anyString());
-        verify(mockAddressService, times(0)).getAddressByUUID(anyString(), any());
-        verify(mockRestaurantService, times(0)).restaurantByUUID(anyString());
-        verify(mockOrderService, times(0)).getCouponByCouponId(anyString());
-        verify(mockOrderService, times(0)).saveOrder(any());
-        verify(mockOrderService, times(0)).saveOrderItem(any());
-    }
-
-    //This test case passes when you have handled the exception of trying to save an order while the payment id you gave
-    // for making the payment does not exist in the database.
-    @Test
-    public void shouldNotSaveOrderIfPaymentMethodDoesNotExists() throws Exception {
-        when(mockCustomerService.getCustomer("database_accesstoken2"))
-                .thenReturn(new CustomerEntity());
-
-        final SaveOrderRequest saveOrderRequest = getSaveOrderRequest();
-        when(mockPaymentService.getPaymentByUUID(saveOrderRequest.getPaymentId().toString()))
-                .thenThrow(new PaymentMethodNotFoundException("PNF-002", "No payment method found by this id"));
-
-        mockMvc
-                .perform(post("/order")
-                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                        .header("authorization", "Bearer database_accesstoken2")
-                        .content(new ObjectMapper().writeValueAsString(saveOrderRequest)))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("code").value("PNF-002"));
-        verify(mockCustomerService, times(1))
-                .getCustomer("database_accesstoken2");
-        verify(mockPaymentService, times(1))
-                .getPaymentByUUID(saveOrderRequest.getPaymentId().toString());
-        verify(mockAddressService, times(0)).getAddressByUUID(anyString(), any());
-        verify(mockRestaurantService, times(0)).restaurantByUUID(anyString());
-        verify(mockOrderService, times(1)).getCouponByCouponId(anyString());
-        verify(mockOrderService, times(0)).saveOrder(any());
-        verify(mockOrderService, times(0)).saveOrderItem(any());
-    }
-
-    //This test case passes when you have handled the exception of trying to save an order while the address id you
-    // gave to deliver the order does not exist in the database.
-    @Test
-    public void shouldNotSaveOrderIfAddressNotFound() throws Exception {
-        final CustomerEntity customerEntity = new CustomerEntity();
-        final String customerId = UUID.randomUUID().toString();
-        customerEntity.setUuid(customerId);
-        when(mockCustomerService.getCustomer("database_accesstoken2"))
-                .thenReturn(customerEntity);
-
-        final SaveOrderRequest saveOrderRequest = getSaveOrderRequest();
-        when(mockPaymentService.getPaymentByUUID(saveOrderRequest.getPaymentId().toString()))
-                .thenReturn(new PaymentEntity());
-        when(mockAddressService.getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity))
-                .thenThrow(new AddressNotFoundException("ANF-003", "No address by this id"));
-
-        mockMvc
-                .perform(post("/order")
-                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                        .header("authorization", "Bearer database_accesstoken2")
-                        .content(new ObjectMapper().writeValueAsString(saveOrderRequest)))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("code").value("ANF-003"));
-        verify(mockCustomerService, times(1))
-                .getCustomer("database_accesstoken2");
-        verify(mockPaymentService, times(1))
-                .getPaymentByUUID(saveOrderRequest.getPaymentId().toString());
-        verify(mockAddressService, times(1))
-                .getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity);
-        verify(mockRestaurantService, times(0)).restaurantByUUID(anyString());
-        verify(mockOrderService, times(1)).getCouponByCouponId(anyString());
-        verify(mockOrderService, times(0)).saveOrder(any());
-        verify(mockOrderService, times(0)).saveOrderItem(any());
-    }
-
-    //This test case passes when you have handled the exception of trying to save an order while the address if you
-    // have given to deliver the order belongs to a different customer.
-    @Test
-    public void shouldNotSaveOrderIfUserUnauthorizedToChangeAddress() throws Exception {
-        final CustomerEntity customerEntity = new CustomerEntity();
-        final String customerId = UUID.randomUUID().toString();
-        customerEntity.setUuid(customerId);
-        when(mockCustomerService.getCustomer("database_accesstoken2"))
-                .thenReturn(customerEntity);
-
-        final SaveOrderRequest saveOrderRequest = getSaveOrderRequest();
-        when(mockPaymentService.getPaymentByUUID(saveOrderRequest.getPaymentId().toString()))
-                .thenReturn(new PaymentEntity());
-        when(mockAddressService.getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity))
-                .thenThrow(new AuthorizationFailedException("ATHR-004", "You are not authorized to view/update/delete any one else's address"));
-
-        mockMvc
-                .perform(post("/order")
-                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                        .header("authorization", "Bearer database_accesstoken2")
-                        .content(new ObjectMapper().writeValueAsString(saveOrderRequest)))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("code").value("ATHR-004"));
-        verify(mockCustomerService, times(1))
-                .getCustomer("database_accesstoken2");
-        verify(mockPaymentService, times(1))
-                .getPaymentByUUID(saveOrderRequest.getPaymentId().toString());
-        verify(mockAddressService, times(1))
-                .getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity);
-        verify(mockRestaurantService, times(0)).restaurantByUUID(anyString());
-        verify(mockOrderService, times(1)).getCouponByCouponId(anyString());
-        verify(mockOrderService, times(0)).saveOrder(any());
-        verify(mockOrderService, times(0)).saveOrderItem(any());
-    }
-
-    //This test case passes when you have handled the exception of trying to save an order while the restaurant id
-    // you gave does not exist in the database.
-    @Test
-    public void shouldNotSaveOrderIfRestaurantDoesNotExists() throws Exception {
-        final CustomerEntity customerEntity = new CustomerEntity();
-        final String customerId = UUID.randomUUID().toString();
-        customerEntity.setUuid(customerId);
-        when(mockCustomerService.getCustomer("database_accesstoken2"))
-                .thenReturn(customerEntity);
-
-        final SaveOrderRequest saveOrderRequest = getSaveOrderRequest();
-        when(mockPaymentService.getPaymentByUUID(saveOrderRequest.getPaymentId().toString()))
-                .thenReturn(new PaymentEntity());
-        when(mockAddressService.getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity))
-                .thenReturn(new AddressEntity());
-        when(mockRestaurantService.restaurantByUUID(saveOrderRequest.getRestaurantId().toString()))
-                .thenThrow(new RestaurantNotFoundException("RNF-001", "No restaurant by this id"));
-
-        mockMvc
-                .perform(post("/order")
-                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                        .header("authorization", "Bearer database_accesstoken2")
-                        .content(new ObjectMapper().writeValueAsString(saveOrderRequest)))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("code").value("RNF-001"));
-        verify(mockCustomerService, times(1))
-                .getCustomer("database_accesstoken2");
-        verify(mockPaymentService, times(1))
-                .getPaymentByUUID(saveOrderRequest.getPaymentId().toString());
-        verify(mockAddressService, times(1))
-                .getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity);
-        verify(mockRestaurantService, times(1))
-                .restaurantByUUID(saveOrderRequest.getRestaurantId().toString());
-        verify(mockOrderService, times(1)).getCouponByCouponId(anyString());
-        verify(mockOrderService, times(0)).saveOrder(any());
-        verify(mockOrderService, times(0)).saveOrderItem(any());
-    }
-
-    //This test case passes when you have handled the exception of trying to save an order while the coupon name
-    // you gave does not exist in the database.
-    @Test
-    public void shouldNotSaveOrderIfCouponNotFound() throws Exception {
-        final CustomerEntity customerEntity = new CustomerEntity();
-        final String customerId = UUID.randomUUID().toString();
-        customerEntity.setUuid(customerId);
-        when(mockCustomerService.getCustomer("database_accesstoken2"))
-                .thenReturn(customerEntity);
-
-        final SaveOrderRequest saveOrderRequest = getSaveOrderRequest();
-        when(mockPaymentService.getPaymentByUUID(saveOrderRequest.getPaymentId().toString()))
-                .thenReturn(new PaymentEntity());
-        when(mockAddressService.getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity))
-                .thenReturn(new AddressEntity());
-        when(mockRestaurantService.restaurantByUUID(saveOrderRequest.getRestaurantId().toString()))
-                .thenReturn(new RestaurantEntity());
-        when(mockOrderService.getCouponByCouponId(saveOrderRequest.getCouponId().toString()))
-                .thenThrow(new CouponNotFoundException("CPF-002", "No coupon by this id"));
-
-        mockMvc
-                .perform(post("/order")
-                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                        .header("authorization", "Bearer database_accesstoken2")
-                        .content(new ObjectMapper().writeValueAsString(saveOrderRequest)))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("code").value("CPF-002"));
-        verify(mockCustomerService, times(1))
-                .getCustomer("database_accesstoken2");
-        verify(mockPaymentService, times(0))
-                .getPaymentByUUID(saveOrderRequest.getPaymentId().toString());
-        verify(mockAddressService, times(0))
-                .getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity);
-        verify(mockRestaurantService, times(0))
-                .restaurantByUUID(saveOrderRequest.getRestaurantId().toString());
-        verify(mockOrderService, times(1))
-                .getCouponByCouponId(saveOrderRequest.getCouponId().toString());
-        verify(mockOrderService, times(0)).saveOrder(any());
-        verify(mockOrderService, times(0)).saveOrderItem(any());
-    }
+//    @Test
+//    public void shouldSaveOrder() throws Exception {
+//        final CustomerEntity customerEntity = new CustomerEntity();
+//        final String customerId = UUID.randomUUID().toString();
+//        customerEntity.setUuid(customerId);
+//        when(mockCustomerService.getCustomer("database_accesstoken2"))
+//                .thenReturn(customerEntity);
+//
+//        final SaveOrderRequest saveOrderRequest = getSaveOrderRequest();
+//        when(mockPaymentService.getPaymentByUUID(saveOrderRequest.getPaymentId().toString()))
+//                .thenReturn(new PaymentEntity());
+//        when(mockAddressService.getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity))
+//                .thenReturn(new AddressEntity());
+//        when(mockRestaurantService.restaurantByUUID(saveOrderRequest.getRestaurantId().toString()))
+//                .thenReturn(new RestaurantEntity());
+//        when(mockOrderService.getCouponByCouponId(saveOrderRequest.getCouponId().toString()))
+//                .thenReturn(new CouponEntity());
+//
+//        final OrderEntity orderEntity = new OrderEntity();
+//        final String orderId = UUID.randomUUID().toString();
+//        orderEntity.setUuid(orderId);
+//        when(mockOrderService.saveOrder(any())).thenReturn(orderEntity);
+//        when(mockOrderService.saveOrderItem(any())).thenReturn(new OrderItemEntity());
+//
+//        mockMvc
+//                .perform(post("/order")
+//                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+//                        .header("authorization", "Bearer database_accesstoken2")
+//                        .content(new ObjectMapper().writeValueAsString(saveOrderRequest)))
+//                .andExpect(status().isCreated())
+//                .andExpect(jsonPath("id").value(orderId));
+//        verify(mockCustomerService, times(1))
+//                .getCustomer("database_accesstoken2");
+//        verify(mockPaymentService, times(1))
+//                .getPaymentByUUID(saveOrderRequest.getPaymentId().toString());
+//        verify(mockAddressService, times(1))
+//                .getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity);
+//        verify(mockRestaurantService, times(1))
+//                .restaurantByUUID(saveOrderRequest.getRestaurantId().toString());
+//        verify(mockOrderService, times(1))
+//                .getCouponByCouponId(saveOrderRequest.getCouponId().toString());
+//        verify(mockOrderService, times(1)).saveOrder(any());
+//        verify(mockOrderService, times(1)).saveOrderItem(any());
+//    }
+//
+//    //This test case passes when you have handled the exception of trying to save an order while you are not logged  in.
+//    @Test
+//    public void shouldNotSaveOrderIfCustomerIsNotLoggedIn() throws Exception {
+//        when(mockCustomerService.getCustomer("invalid_auth"))
+//                .thenThrow(new AuthorizationFailedException("ATHR-001", "Customer is not Logged in."));
+//
+//        mockMvc
+//                .perform(post("/order")
+//                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+//                        .header("authorization", "Bearer invalid_auth")
+//                        .content(new ObjectMapper().writeValueAsString(getSaveOrderRequest())))
+//                .andExpect(status().isForbidden())
+//                .andExpect(jsonPath("code").value("ATHR-001"));
+//
+//        verify(mockCustomerService, times(1)).getCustomer("invalid_auth");
+//        verify(mockPaymentService, times(0)).getPaymentByUUID(anyString());
+//        verify(mockAddressService, times(0)).getAddressByUUID(anyString(), any());
+//        verify(mockRestaurantService, times(0)).restaurantByUUID(anyString());
+//        verify(mockOrderService, times(0)).getCouponByCouponId(anyString());
+//        verify(mockOrderService, times(0)).saveOrder(any());
+//        verify(mockOrderService, times(0)).saveOrderItem(any());
+//    }
+//
+//    //This test case passes when you have handled the exception of trying to save an order while you are already logged out.
+//    @Test
+//    public void shouldNotSaveOrderIfCustomerIsLoggedOut() throws Exception {
+//        when(mockCustomerService.getCustomer("invalid_auth"))
+//                .thenThrow(new AuthorizationFailedException("ATHR-002", "Customer is logged out. Log in again to access this endpoint."));
+//        mockMvc
+//                .perform(post("/order")
+//                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+//                        .header("authorization", "Bearer invalid_auth")
+//                        .content(new ObjectMapper().writeValueAsString(getSaveOrderRequest())))
+//                .andExpect(status().isForbidden())
+//                .andExpect(jsonPath("code").value("ATHR-002"));
+//
+//        verify(mockCustomerService, times(1)).getCustomer("invalid_auth");
+//        verify(mockPaymentService, times(0)).getPaymentByUUID(anyString());
+//        verify(mockAddressService, times(0)).getAddressByUUID(anyString(), any());
+//        verify(mockRestaurantService, times(0)).restaurantByUUID(anyString());
+//        verify(mockOrderService, times(0)).getCouponByCouponId(anyString());
+//        verify(mockOrderService, times(0)).saveOrder(any());
+//        verify(mockOrderService, times(0)).saveOrderItem(any());
+//    }
+//
+//    //This test case passes when you have handled the exception of trying to save an order while your session is
+//    // already expired.
+//    @Test
+//    public void shouldNotSaveOrderIfCustomerSessionIsExpired() throws Exception {
+//        when(mockCustomerService.getCustomer("invalid_auth"))
+//                .thenThrow(new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint."));
+//        mockMvc
+//                .perform(post("/order")
+//                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+//                        .header("authorization", "Bearer invalid_auth")
+//                        .content(new ObjectMapper().writeValueAsString(getSaveOrderRequest())))
+//                .andExpect(status().isForbidden())
+//                .andExpect(jsonPath("code").value("ATHR-003"));
+//
+//        verify(mockCustomerService, times(1)).getCustomer("invalid_auth");
+//        verify(mockPaymentService, times(0)).getPaymentByUUID(anyString());
+//        verify(mockAddressService, times(0)).getAddressByUUID(anyString(), any());
+//        verify(mockRestaurantService, times(0)).restaurantByUUID(anyString());
+//        verify(mockOrderService, times(0)).getCouponByCouponId(anyString());
+//        verify(mockOrderService, times(0)).saveOrder(any());
+//        verify(mockOrderService, times(0)).saveOrderItem(any());
+//    }
+//
+//    //This test case passes when you have handled the exception of trying to save an order while the payment id you gave
+//    // for making the payment does not exist in the database.
+//    @Test
+//    public void shouldNotSaveOrderIfPaymentMethodDoesNotExists() throws Exception {
+//        when(mockCustomerService.getCustomer("database_accesstoken2"))
+//                .thenReturn(new CustomerEntity());
+//
+//        final SaveOrderRequest saveOrderRequest = getSaveOrderRequest();
+//        when(mockPaymentService.getPaymentByUUID(saveOrderRequest.getPaymentId().toString()))
+//                .thenThrow(new PaymentMethodNotFoundException("PNF-002", "No payment method found by this id"));
+//
+//        mockMvc
+//                .perform(post("/order")
+//                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+//                        .header("authorization", "Bearer database_accesstoken2")
+//                        .content(new ObjectMapper().writeValueAsString(saveOrderRequest)))
+//                .andExpect(status().isNotFound())
+//                .andExpect(jsonPath("code").value("PNF-002"));
+//        verify(mockCustomerService, times(1))
+//                .getCustomer("database_accesstoken2");
+//        verify(mockPaymentService, times(1))
+//                .getPaymentByUUID(saveOrderRequest.getPaymentId().toString());
+//        verify(mockAddressService, times(0)).getAddressByUUID(anyString(), any());
+//        verify(mockRestaurantService, times(0)).restaurantByUUID(anyString());
+//        verify(mockOrderService, times(1)).getCouponByCouponId(anyString());
+//        verify(mockOrderService, times(0)).saveOrder(any());
+//        verify(mockOrderService, times(0)).saveOrderItem(any());
+//    }
+//
+//    //This test case passes when you have handled the exception of trying to save an order while the address id you
+//    // gave to deliver the order does not exist in the database.
+//    @Test
+//    public void shouldNotSaveOrderIfAddressNotFound() throws Exception {
+//        final CustomerEntity customerEntity = new CustomerEntity();
+//        final String customerId = UUID.randomUUID().toString();
+//        customerEntity.setUuid(customerId);
+//        when(mockCustomerService.getCustomer("database_accesstoken2"))
+//                .thenReturn(customerEntity);
+//
+//        final SaveOrderRequest saveOrderRequest = getSaveOrderRequest();
+//        when(mockPaymentService.getPaymentByUUID(saveOrderRequest.getPaymentId().toString()))
+//                .thenReturn(new PaymentEntity());
+//        when(mockAddressService.getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity))
+//                .thenThrow(new AddressNotFoundException("ANF-003", "No address by this id"));
+//
+//        mockMvc
+//                .perform(post("/order")
+//                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+//                        .header("authorization", "Bearer database_accesstoken2")
+//                        .content(new ObjectMapper().writeValueAsString(saveOrderRequest)))
+//                .andExpect(status().isNotFound())
+//                .andExpect(jsonPath("code").value("ANF-003"));
+//        verify(mockCustomerService, times(1))
+//                .getCustomer("database_accesstoken2");
+//        verify(mockPaymentService, times(1))
+//                .getPaymentByUUID(saveOrderRequest.getPaymentId().toString());
+//        verify(mockAddressService, times(1))
+//                .getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity);
+//        verify(mockRestaurantService, times(0)).restaurantByUUID(anyString());
+//        verify(mockOrderService, times(1)).getCouponByCouponId(anyString());
+//        verify(mockOrderService, times(0)).saveOrder(any());
+//        verify(mockOrderService, times(0)).saveOrderItem(any());
+//    }
+//
+//    //This test case passes when you have handled the exception of trying to save an order while the address if you
+//    // have given to deliver the order belongs to a different customer.
+//    @Test
+//    public void shouldNotSaveOrderIfUserUnauthorizedToChangeAddress() throws Exception {
+//        final CustomerEntity customerEntity = new CustomerEntity();
+//        final String customerId = UUID.randomUUID().toString();
+//        customerEntity.setUuid(customerId);
+//        when(mockCustomerService.getCustomer("database_accesstoken2"))
+//                .thenReturn(customerEntity);
+//
+//        final SaveOrderRequest saveOrderRequest = getSaveOrderRequest();
+//        when(mockPaymentService.getPaymentByUUID(saveOrderRequest.getPaymentId().toString()))
+//                .thenReturn(new PaymentEntity());
+//        when(mockAddressService.getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity))
+//                .thenThrow(new AuthorizationFailedException("ATHR-004", "You are not authorized to view/update/delete any one else's address"));
+//
+//        mockMvc
+//                .perform(post("/order")
+//                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+//                        .header("authorization", "Bearer database_accesstoken2")
+//                        .content(new ObjectMapper().writeValueAsString(saveOrderRequest)))
+//                .andExpect(status().isForbidden())
+//                .andExpect(jsonPath("code").value("ATHR-004"));
+//        verify(mockCustomerService, times(1))
+//                .getCustomer("database_accesstoken2");
+//        verify(mockPaymentService, times(1))
+//                .getPaymentByUUID(saveOrderRequest.getPaymentId().toString());
+//        verify(mockAddressService, times(1))
+//                .getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity);
+//        verify(mockRestaurantService, times(0)).restaurantByUUID(anyString());
+//        verify(mockOrderService, times(1)).getCouponByCouponId(anyString());
+//        verify(mockOrderService, times(0)).saveOrder(any());
+//        verify(mockOrderService, times(0)).saveOrderItem(any());
+//    }
+//
+//    //This test case passes when you have handled the exception of trying to save an order while the restaurant id
+//    // you gave does not exist in the database.
+//    @Test
+//    public void shouldNotSaveOrderIfRestaurantDoesNotExists() throws Exception {
+//        final CustomerEntity customerEntity = new CustomerEntity();
+//        final String customerId = UUID.randomUUID().toString();
+//        customerEntity.setUuid(customerId);
+//        when(mockCustomerService.getCustomer("database_accesstoken2"))
+//                .thenReturn(customerEntity);
+//
+//        final SaveOrderRequest saveOrderRequest = getSaveOrderRequest();
+//        when(mockPaymentService.getPaymentByUUID(saveOrderRequest.getPaymentId().toString()))
+//                .thenReturn(new PaymentEntity());
+//        when(mockAddressService.getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity))
+//                .thenReturn(new AddressEntity());
+//        when(mockRestaurantService.restaurantByUUID(saveOrderRequest.getRestaurantId().toString()))
+//                .thenThrow(new RestaurantNotFoundException("RNF-001", "No restaurant by this id"));
+//
+//        mockMvc
+//                .perform(post("/order")
+//                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+//                        .header("authorization", "Bearer database_accesstoken2")
+//                        .content(new ObjectMapper().writeValueAsString(saveOrderRequest)))
+//                .andExpect(status().isNotFound())
+//                .andExpect(jsonPath("code").value("RNF-001"));
+//        verify(mockCustomerService, times(1))
+//                .getCustomer("database_accesstoken2");
+//        verify(mockPaymentService, times(1))
+//                .getPaymentByUUID(saveOrderRequest.getPaymentId().toString());
+//        verify(mockAddressService, times(1))
+//                .getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity);
+//        verify(mockRestaurantService, times(1))
+//                .restaurantByUUID(saveOrderRequest.getRestaurantId().toString());
+//        verify(mockOrderService, times(1)).getCouponByCouponId(anyString());
+//        verify(mockOrderService, times(0)).saveOrder(any());
+//        verify(mockOrderService, times(0)).saveOrderItem(any());
+//    }
+//
+//    //This test case passes when you have handled the exception of trying to save an order while the coupon name
+//    // you gave does not exist in the database.
+//    @Test
+//    public void shouldNotSaveOrderIfCouponNotFound() throws Exception {
+//        final CustomerEntity customerEntity = new CustomerEntity();
+//        final String customerId = UUID.randomUUID().toString();
+//        customerEntity.setUuid(customerId);
+//        when(mockCustomerService.getCustomer("database_accesstoken2"))
+//                .thenReturn(customerEntity);
+//
+//        final SaveOrderRequest saveOrderRequest = getSaveOrderRequest();
+//        when(mockPaymentService.getPaymentByUUID(saveOrderRequest.getPaymentId().toString()))
+//                .thenReturn(new PaymentEntity());
+//        when(mockAddressService.getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity))
+//                .thenReturn(new AddressEntity());
+//        when(mockRestaurantService.restaurantByUUID(saveOrderRequest.getRestaurantId().toString()))
+//                .thenReturn(new RestaurantEntity());
+//        when(mockOrderService.getCouponByCouponId(saveOrderRequest.getCouponId().toString()))
+//                .thenThrow(new CouponNotFoundException("CPF-002", "No coupon by this id"));
+//
+//        mockMvc
+//                .perform(post("/order")
+//                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+//                        .header("authorization", "Bearer database_accesstoken2")
+//                        .content(new ObjectMapper().writeValueAsString(saveOrderRequest)))
+//                .andExpect(status().isNotFound())
+//                .andExpect(jsonPath("code").value("CPF-002"));
+//        verify(mockCustomerService, times(1))
+//                .getCustomer("database_accesstoken2");
+//        verify(mockPaymentService, times(0))
+//                .getPaymentByUUID(saveOrderRequest.getPaymentId().toString());
+//        verify(mockAddressService, times(0))
+//                .getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity);
+//        verify(mockRestaurantService, times(0))
+//                .restaurantByUUID(saveOrderRequest.getRestaurantId().toString());
+//        verify(mockOrderService, times(1))
+//                .getCouponByCouponId(saveOrderRequest.getCouponId().toString());
+//        verify(mockOrderService, times(0)).saveOrder(any());
+//        verify(mockOrderService, times(0)).saveOrderItem(any());
+//    }
 
     // ------------------------------------------ GET /order ------------------------------------------
 
@@ -433,7 +438,7 @@ public class OrderControllerTest {
         verify(mockOrderService, times(0)).getOrdersByCustomers(anyString());
     }
 
-    // ------------------------------------------ GET /order/coupon/{coupon_name} ------------------------------------------
+    // ------------------------------------------ GET /order/coupon/{coupon_name} ------------------------------------------//
 
     //This test case passes when you are able to retrieve coupon details by coupon name.
     @Test
@@ -546,7 +551,7 @@ public class OrderControllerTest {
         verify(mockOrderService, times(1)).getCouponByCouponName("myCoupon");
     }
 
-    // ------------------------------------------ POJO Builder ------------------------------------------
+    // ------------------------------------------ POJO Builder ------------------------------------------//
 
     private SaveOrderRequest getSaveOrderRequest() {
         final SaveOrderRequest request = new SaveOrderRequest();
@@ -611,4 +616,3 @@ public class OrderControllerTest {
 
 }
 
- */
