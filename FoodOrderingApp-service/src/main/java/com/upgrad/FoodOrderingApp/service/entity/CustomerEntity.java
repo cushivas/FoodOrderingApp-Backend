@@ -1,13 +1,12 @@
 package com.upgrad.FoodOrderingApp.service.entity;
 
+import java.io.Serializable;
+
 /**
  * @author swapnadeep.dutta
  * 
  * This class is for fetching and storing the information regarding the customer
  */
-
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,23 +15,24 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.validation.constraints.Email;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import org.apache.commons.lang3.builder.*;
+
+//This Class represents the Customer table in the DB.
 
 @Entity
-@Table(name = "customer")
+@Table(name = "customer", uniqueConstraints = { @UniqueConstraint(columnNames = { "uuid", "contact_number" }) })
 @NamedQueries({
-		@NamedQuery(name = "customerByContactNumber", query = "select c from CustomerEntity c where c.contactNumber = :contactNumber") })
-public class CustomerEntity implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+		@NamedQuery(name = "customerByContactNumber", query = "SELECT c from CustomerEntity c where c.contactNumber = :contact_number"),
+		@NamedQuery(name = "customerByUuid", query = "SELECT c from CustomerEntity c where c.uuid = :uuid") })
+public class CustomerEntity implements Serializable {
 
 	@Id
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private Integer id;
 
 	@Column(name = "uuid")
 	@Size(max = 200)
@@ -46,65 +46,32 @@ public class CustomerEntity implements Serializable {
 
 	@Column(name = "lastname")
 	@Size(max = 30)
-	@NotNull
 	private String lastName;
-
-	@Column(name = "email")
-	@Size(max = 50)
-	@NotNull
-	@Email(message = "Please enter a valid email address")
-	private String email;
 
 	@Column(name = "contact_number")
 	@Size(max = 30)
 	@NotNull
 	private String contactNumber;
 
+	@Column(name = "email")
+	@Size(max = 50)
+	private String email;
+
 	@Column(name = "password")
 	@Size(max = 255)
 	@NotNull
-	@ToStringExclude
 	private String password;
 
 	@Column(name = "salt")
 	@Size(max = 255)
 	@NotNull
-	@ToStringExclude
 	private String salt;
 
-	// No-argument Constructor for empty initializing
-
-	public CustomerEntity() {
-
-	}
-
-	// Initialized constructor
-
-	public CustomerEntity(long id, @Size(max = 200) @NotNull String uuid, @Size(max = 30) @NotNull String firstName,
-			@Size(max = 30) @NotNull String lastName,
-			@Size(max = 50) @NotNull @Email(message = "Please enter a valid email address") String email,
-			@Size(max = 30) @NotNull String contactNumber, @Size(max = 255) @NotNull String password,
-			@Size(max = 255) @NotNull String salt) {
-		this.id = id;
-		this.uuid = uuid;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.email = email;
-		this.contactNumber = contactNumber;
-		this.password = password;
-		this.salt = salt;
-	}
-
-	/*
-	 * Getters and Setters method to fetch and store the information in the
-	 * databases
-	 */
-
-	public long getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -132,20 +99,20 @@ public class CustomerEntity implements Serializable {
 		this.lastName = lastName;
 	}
 
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
 	public String getContactNumber() {
 		return contactNumber;
 	}
 
 	public void setContactNumber(String contactNumber) {
 		this.contactNumber = contactNumber;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public String getPassword() {
@@ -162,21 +129,6 @@ public class CustomerEntity implements Serializable {
 
 	public void setSalt(String salt) {
 		this.salt = salt;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return new EqualsBuilder().append(this, obj).isEquals();
-	}
-
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder().append(this).hashCode();
-	}
-
-	@Override
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
 	}
 
 }
