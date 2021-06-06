@@ -20,9 +20,9 @@ public class CategoryDao {
 
 
     /**
-     *  Get Category by UUID..
+     * Get Category details by  categiryUUID..
      * @param uuid
-     * @return
+     * @return Category details
      */
     public CategoryEntity getCategoryByUuid(String uuid) {
         try {
@@ -34,8 +34,8 @@ public class CategoryDao {
     }
 
     /**
-     *  Get all the categories from db..
-     * @return
+     * Get all the restaurants categories from db..
+     * @return List of Categories
      */
     public List<CategoryEntity> getAllCategoriesOrderedByName() {
         try {

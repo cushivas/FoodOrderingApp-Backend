@@ -8,7 +8,9 @@ package com.upgrad.FoodOrderingApp.service.entity;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -22,61 +24,33 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
-@Table(name = "customer_adress")
+@Table(name = "customer_address")
 @NamedQueries({
-		@NamedQuery(name = "customerAddressByAddressId", query = "select cad from CustomerAddressEntity cad where cad.address = :address"),
-		@NamedQuery(name = "customerAddressesByCustomerId", query = "select cad from CustomerAddressEntity cad where cad.customer = :customer") })
+		@NamedQuery(name = "getAllCustomerAddressByCustomer", query = "SELECT c from CustomerAddressEntity c where c.customer = :customer_entity AND c.address.active = :active"),
+		@NamedQuery(name = "getCustomerAddressByAddress", query = "SELECT c from CustomerAddressEntity c where c.address = :address_entity") })
 public class CustomerAddressEntity implements Serializable {
 
-	private static final long serialVersionUID = 1L;
-
 	@Id
+	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private Integer id;
 
-	@ManyToOne
-	@OnDelete(action = OnDeleteAction.CASCADE)
-	@JoinColumn(name = "address_id")
-	private AddressEntity address;
-
-	@ManyToOne
-	@OnDelete(action = OnDeleteAction.CASCADE)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "customer_id")
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	private CustomerEntity customer;
 
-	// No-argument Constructor for empty initializing
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "address_id")
+	@OnDelete(action = OnDeleteAction.NO_ACTION)
+	private AddressEntity address;
 
-	public CustomerAddressEntity() {
-
-	}
-
-	// Initialized constructor
-
-	public CustomerAddressEntity(long id, AddressEntity address, CustomerEntity customer) {
-		this.id = id;
-		this.address = address;
-		this.customer = customer;
-	}
-
-	/*
-	 * Getters and Setters method to fetch and store the information in the
-	 * databases
-	 */
-
-	public long getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(Integer id) {
 		this.id = id;
-	}
-
-	public AddressEntity getAddress() {
-		return address;
-	}
-
-	public void setAddress(AddressEntity address) {
-		this.address = address;
 	}
 
 	public CustomerEntity getCustomer() {
@@ -87,4 +61,11 @@ public class CustomerAddressEntity implements Serializable {
 		this.customer = customer;
 	}
 
+	public AddressEntity getAddress() {
+		return address;
+	}
+
+	public void setAddress(AddressEntity address) {
+		this.address = address;
+	}
 }

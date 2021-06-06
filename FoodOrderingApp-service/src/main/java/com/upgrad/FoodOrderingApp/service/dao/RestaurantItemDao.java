@@ -13,6 +13,12 @@ public class RestaurantItemDao {
     @PersistenceContext
     private EntityManager entityManager;
 
+    /**
+     * Get list of all the menu items present for current restaurant
+     * @param restaurantEntity
+     * @return List of items
+     */
+
     public List<RestaurantItemEntity> getItemsByRestaurant(RestaurantEntity restaurantEntity) {
         try {
             List<RestaurantItemEntity> restaurantItemEntities = entityManager.createNamedQuery("getItemsByRestaurant",RestaurantItemEntity.class).setParameter("restaurant",restaurantEntity).getResultList();

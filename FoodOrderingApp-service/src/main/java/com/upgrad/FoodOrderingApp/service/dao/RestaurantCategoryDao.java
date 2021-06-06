@@ -14,6 +14,11 @@ public class RestaurantCategoryDao {
     @PersistenceContext
     private EntityManager entityManager;
 
+    /**
+     * List of all the restaurant and category mapping
+     * @param restaurantEntity
+     * @return
+     */
     public List<RestaurantCategoryEntity> getCategoriesByRestaurant(RestaurantEntity restaurantEntity){
         try {
             List<RestaurantCategoryEntity> restaurantCategoryEntity = entityManager.createNamedQuery("getCategoriesByRestaurant",RestaurantCategoryEntity.class).setParameter("restaurant",restaurantEntity).getResultList();
@@ -23,6 +28,12 @@ public class RestaurantCategoryDao {
         }
 
     }
+
+    /**
+     *  Get all the restaurants by Category
+     * @param categoryEntity
+     * @return List of restaurants
+     */
 
     public List<RestaurantCategoryEntity> getRestaurantByCategory(CategoryEntity categoryEntity) {
         try {
