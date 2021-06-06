@@ -6,12 +6,20 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
+/**
+ *  Database access class for restaurant related operations
+ */
 
 @Repository
 public class RestaurantDao {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    /**
+     *  Get list of all restaurants by rating..
+     * @return list of restaurants
+     */
 
     public List<RestaurantEntity> restaurantsByRating(){
         try{
@@ -22,6 +30,11 @@ public class RestaurantDao {
         }
     }
 
+    /**
+     * Get current restaurant details
+     * @param uuid restaurant uuid
+     * @return List of Restaurant details for current uuid..
+     */
 
     public RestaurantEntity getRestaurantByUuid(String uuid) {
         try {
@@ -33,6 +46,12 @@ public class RestaurantDao {
 
     }
 
+    /**
+     * Get current restaurant details by name
+     * @param restaurantName restaurant name
+     * @return List of Restaurant details for current restaurant name..
+     */
+
     public List<RestaurantEntity> restaurantsByName(String restaurantName) {
         try {
             String restaurantNameLow = "%"+restaurantName.toLowerCase()+"%";
@@ -43,6 +62,12 @@ public class RestaurantDao {
         }
 
     }
+
+    /**
+     *  Method to update restaurant rating in db
+     * @param restaurantEntity
+     * @return
+     */
 
     public RestaurantEntity updateRestaurantRating(RestaurantEntity restaurantEntity) {
         entityManager.merge(restaurantEntity);

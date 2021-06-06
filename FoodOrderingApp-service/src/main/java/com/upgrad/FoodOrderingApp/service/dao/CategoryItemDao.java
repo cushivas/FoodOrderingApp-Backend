@@ -9,8 +9,10 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
-//This Class is created to access DB with respect to categoryItem entity
 
+/**
+ * This Class is created to access DB with respect to categoryItem entity
+ */
 @Repository
 public class CategoryItemDao {
 
@@ -18,7 +20,12 @@ public class CategoryItemDao {
     @PersistenceContext
     private EntityManager entityManager;
 
-    //To get List of CategoryItemEntity by CategoryEntity if no result then null is returned
+    /**
+     * To get List of CategoryItemEntity by CategoryEntity if no result then null is returned
+     * @param categoryEntity
+     * @return
+     */
+
     public List<CategoryItemEntity> getItemsByCategory(CategoryEntity categoryEntity) {
         try {
             List<CategoryItemEntity> categoryItemEntities = entityManager.createNamedQuery("getItemsByCategory",CategoryItemEntity.class).setParameter("category",categoryEntity).getResultList();

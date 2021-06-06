@@ -9,24 +9,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.springframework.stereotype.Component;
-
 import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import com.upgrad.FoodOrderingApp.service.exception.AuthenticationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.SignUpRestrictedException;
 import com.upgrad.FoodOrderingApp.service.exception.UpdateCustomerException;
 
+/**
+ *  This is utility class
+ */
 @Component
 public class Utility {
-	public boolean isValidRating(String cutomerRating) {
-		if (cutomerRating.equals("5.0")) {
-			return true;
-		}
-		Pattern p = Pattern.compile("[1-4].[0-9]");
-		Matcher m = p.matcher(cutomerRating);
-		return (m.find() && m.group().equals(cutomerRating));
-	}
+    /**
+     *  This method validates if rating return by user is valid or not..
+     * @param cutomerRating
+     * @return
+     */
+    public boolean isValidRating(String cutomerRating){
+        if(cutomerRating.equals("5.0")){
+            return true;
+        }
+        Pattern p = Pattern.compile("[1-4].[0-9]");
+        Matcher m = p.matcher(cutomerRating);
+        return (m.find() && m.group().equals(cutomerRating));
+    }
 
 	// To validate the password as per given
 	// conditions,1Uppercase,1Lowercase,1Number,1SpecialCharacter and atleast 8
