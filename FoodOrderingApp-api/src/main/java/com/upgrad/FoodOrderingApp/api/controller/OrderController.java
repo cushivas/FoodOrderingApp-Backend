@@ -2,7 +2,6 @@ package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.upgrad.FoodOrderingApp.api.model.*;
 import com.upgrad.FoodOrderingApp.service.businness.*;
-
 import com.upgrad.FoodOrderingApp.service.entity.*;
 import com.upgrad.FoodOrderingApp.service.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.math.BigDecimal;
-
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,17 +26,18 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
+    @Autowired
+    private RestaurantService restaurantService;
 
-@Autowired
-private RestaurantService restaurantService;
+    @Autowired
+    private ItemService itemService;
 
-@Autowired
-private ItemService itemService;
+    @Autowired
+    private AddressService addressService;
 
-@Autowired
-private AddressService addressService;
-@Autowired
-private PaymentService paymentService;
+    @Autowired
+    private PaymentService paymentService;
+
     /**
      * Method takes customers access token and retrieves a list of all of the customer's orders
      *
@@ -122,6 +120,8 @@ private PaymentService paymentService;
     }
 
     /**
+     * Method takes customer access token and coupon names and return coupon detail response
+     *
      * @param authorization customer who owns the coupon
      * @param couponName    name of the coupon
      * @return couponDetailResponse
@@ -148,16 +148,17 @@ private PaymentService paymentService;
     }
 
     /**
+     * Method take access token and save the order of particular customer
      *
-     * @param authorization to check for valid customer
+     * @param authorization    to check for valid customer
      * @param saveOrderRequest to save the requested order
      * @return save order Response
-     * @throws AuthorizationFailedException if the customer is not authorized
-     * @throws AddressNotFoundException if the address of customer does not exist in data base
-     * @throws RestaurantNotFoundException if restaurant is not found
-     * @throws CouponNotFoundException if the valid coupon is not found
-     * @throws PaymentMethodNotFoundException
-     * @throws ItemNotFoundException
+     * @throws AuthorizationFailedException   if the customer is not authorized
+     * @throws AddressNotFoundException       if the address of customer does not exist in data base
+     * @throws RestaurantNotFoundException    if restaurant is not found
+     * @throws CouponNotFoundException        if the valid coupon is not found
+     * @throws PaymentMethodNotFoundException if payment method is not found
+     * @throws ItemNotFoundException          if item does not exist
      */
 
     @CrossOrigin
@@ -215,8 +216,6 @@ private PaymentService paymentService;
         saveOrderResponse.setId(savedOrderEntity.getUuid());
         return new ResponseEntity<>(saveOrderResponse, HttpStatus.CREATED);
     }
-
-
 
 
 }

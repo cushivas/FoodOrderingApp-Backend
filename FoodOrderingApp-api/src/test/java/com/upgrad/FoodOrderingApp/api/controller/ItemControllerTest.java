@@ -1,4 +1,4 @@
-/*
+
 package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.UUID;
 
 import static com.upgrad.FoodOrderingApp.service.common.ItemType.NON_VEG;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -70,7 +71,7 @@ public class ItemControllerTest {
     //This test case passes when you have handled the exception of trying to fetch most popular items of a restaurant,
     // but the restaurant id you gave does not exist.
     @Test
-    public void shouldNotGetItemsByPopularityIfRestaurantDoesNOtExistForGivenId() throws Exception {
+    public void shouldNotGetItemsByPopularityIfRestaurantDoesNotExistForGivenId() throws Exception {
         when(mockRestaurantService.restaurantByUUID("some_restaurant_id"))
                 .thenThrow(new RestaurantNotFoundException("RNF-001", "No restaurant by this id"));
 
@@ -81,4 +82,3 @@ public class ItemControllerTest {
     }
 
 }
-*/

@@ -16,9 +16,11 @@ import java.util.List;
 @Service
 public class OrderService {
 
-    @Autowired private CouponDao couponDao;
+    @Autowired
+    private CouponDao couponDao;
 
-    @Autowired private OrderDao orderDao;
+    @Autowired
+    private OrderDao orderDao;
 
     /**
      * This method contains business logic to get coupon details by coupon name.
@@ -43,8 +45,6 @@ public class OrderService {
     }
 
 
-
-
     /**
      * Fetches the orders of the customer in a sorted manner with latest order being on the top.
      *
@@ -55,5 +55,36 @@ public class OrderService {
         return orderDao.getOrdersByCustomers(customerUUID);
     }
 
+    /**
+     * @param uuid to fetch coupon by uuid
+     * @return coupon entity
+     * @throws CouponNotFoundException if the coupon for corresponding coupon id is not found
+     */
+    public CouponEntity getCouponByCouponId(String uuid) throws CouponNotFoundException {
+        CouponEntity couponEntity = couponDao.getCouponByCouponId(uuid);
+        if (couponEntity != null) {
+            return couponEntity;
+        } else
+            throw new CouponNotFoundException("CPF-002", "No coupon by this id");
+    }
+
+    /**
+     * method to save the details of order
+     *
+     * @param orderEntity which contain order details
+     * @return save order entity
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    public OrderEntity saveOrder(OrderEntity orderEntity) {
+        return orderDao.saveOrder(orderEntity);
+    }
+
+    /**
+     *  Method to save order items
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    public OrderItemEntity saveOrderItem(OrderItemEntity orderedItem) {
+        return orderDao.saveOrderItem(orderedItem);
+    }
 
 }

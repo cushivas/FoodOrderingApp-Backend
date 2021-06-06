@@ -20,8 +20,10 @@ import java.util.List;
 @Table(name = "orders")
 @NamedQueries({
         @NamedQuery(name = "allOrdersByAddress", query = "select o from OrderEntity o where o.address=:address"),
-        @NamedQuery(name = "getOrdersByCustomer", query = "select o from OrderEntity o where o.customer.uuid=:customerUUID order by o.date desc")})
+        @NamedQuery(name = "getOrdersByCustomer", query = "select o from OrderEntity o where o.customer.uuid=:customerUUID order by o.date desc"),
+        @NamedQuery(name="getOrdersByRestaurant",query = "select o from OrderEntity o where o.restaurant=:restaurant")
 
+})
 public class OrderEntity implements Serializable {
 
     @Id
