@@ -1,4 +1,3 @@
-
 package com.upgrad.FoodOrderingApp.api.controller;
 
 
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.upgrad.FoodOrderingApp.api.model.ItemList;
 import com.upgrad.FoodOrderingApp.api.model.ItemListResponse;
 import com.upgrad.FoodOrderingApp.service.businness.ItemService;
@@ -27,6 +27,7 @@ import com.upgrad.FoodOrderingApp.service.exception.RestaurantNotFoundException;
 @RestController
 @RequestMapping("/item")
 public class ItemController {
+
     @Autowired
     ItemService itemService; // Handles all the Service Related to Item.
 
@@ -37,8 +38,8 @@ public class ItemController {
     & produces response in ItemListResponse and returns list of 5 items sold by restaurant on basis of popularity  with details from the db. If error returns error code and error message.
     */
     @CrossOrigin
-    @RequestMapping(method = RequestMethod.GET, path = "/restaurant/{restaurant_id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<ItemListResponse> getTopFiveItemsByPopularity(@PathVariable(value = "restaurant_id") final String restaurantUuid) throws RestaurantNotFoundException {
+    @RequestMapping(method = RequestMethod.GET,path = "/restaurant/{restaurant_id}",produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<ItemListResponse> getTopFiveItemsByPopularity (@PathVariable(value = "restaurant_id")final String restaurantUuid) throws RestaurantNotFoundException {
 
         //Calls restaurantByUUID method of restaurantService to get the restaurant entity.
         RestaurantEntity restaurantEntity = restaurantService.restaurantByUUID(restaurantUuid);
@@ -51,12 +52,12 @@ public class ItemController {
         itemEntities.forEach(itemEntity -> {
             ItemList itemList = new ItemList()
                     .id(UUID.fromString(itemEntity.getUuid()))
-                    .itemName(itemEntity.getItemName())
+                    .itemName(itemEntity.getitemName())
                     .price(itemEntity.getPrice())
                     .itemType(ItemList.ItemTypeEnum.fromValue(itemEntity.getType().getValue()));
             itemListResponse.add(itemList);
         });
 
-        return new ResponseEntity<ItemListResponse>(itemListResponse, HttpStatus.OK);
+        return new ResponseEntity<ItemListResponse>(itemListResponse,HttpStatus.OK);
     }
 }
