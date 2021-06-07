@@ -1,4 +1,4 @@
-/*
+
 
 package com.upgrad.FoodOrderingApp.api.controller;
 
@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.upgrad.FoodOrderingApp.api.model.CustomerOrderResponse;
 import com.upgrad.FoodOrderingApp.api.model.ItemQuantity;
 import com.upgrad.FoodOrderingApp.api.model.SaveOrderRequest;
+import com.upgrad.FoodOrderingApp.service.businness.*;
+import com.upgrad.FoodOrderingApp.service.entity.*;
 import com.upgrad.FoodOrderingApp.service.exception.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,19 +18,17 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Date;
 import java.util.UUID;
-
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import static org.junit.Assert.assertEquals;
 // This class contains all the test cases regarding the order controller
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -103,7 +103,7 @@ public class OrderControllerTest {
         verify(mockOrderService, times(1)).saveOrderItem(any());
     }
 
-    //This test case passes when you have handled the exception of trying to save an order while you are not logged  in.
+//    //This test case passes when you have handled the exception of trying to save an order while you are not logged  in.
     @Test
     public void shouldNotSaveOrderIfCustomerIsNotLoggedIn() throws Exception {
         when(mockCustomerService.getCustomer("invalid_auth"))
@@ -125,8 +125,8 @@ public class OrderControllerTest {
         verify(mockOrderService, times(0)).saveOrder(any());
         verify(mockOrderService, times(0)).saveOrderItem(any());
     }
-
-    //This test case passes when you have handled the exception of trying to save an order while you are already logged out.
+//
+//    //This test case passes when you have handled the exception of trying to save an order while you are already logged out.
     @Test
     public void shouldNotSaveOrderIfCustomerIsLoggedOut() throws Exception {
         when(mockCustomerService.getCustomer("invalid_auth"))
@@ -433,7 +433,7 @@ public class OrderControllerTest {
         verify(mockOrderService, times(0)).getOrdersByCustomers(anyString());
     }
 
-    // ------------------------------------------ GET /order/coupon/{coupon_name} ------------------------------------------
+    // ------------------------------------------ GET /order/coupon/{coupon_name} ------------------------------------------//
 
     //This test case passes when you are able to retrieve coupon details by coupon name.
     @Test
@@ -546,7 +546,7 @@ public class OrderControllerTest {
         verify(mockOrderService, times(1)).getCouponByCouponName("myCoupon");
     }
 
-    // ------------------------------------------ POJO Builder ------------------------------------------
+    // ------------------------------------------ POJO Builder ------------------------------------------//
 
     private SaveOrderRequest getSaveOrderRequest() {
         final SaveOrderRequest request = new SaveOrderRequest();
@@ -611,4 +611,3 @@ public class OrderControllerTest {
 
 }
 
- */
