@@ -43,7 +43,7 @@ public class AddressService {
 			throws SaveAddressException {
 		if (addressEntity.getActive() != null && addressEntity.getLocality() != null
 				&& !addressEntity.getLocality().isEmpty() && addressEntity.getCity() != null
-				&& addressEntity.getCity().isEmpty() && addressEntity.getFlatBuildingNumber() != null
+				&& !addressEntity.getCity().isEmpty() && addressEntity.getFlatBuildingNumber() != null
 				&& !addressEntity.getFlatBuildingNumber().isEmpty() && addressEntity.getPincode() != null
 				&& addressEntity.getPincode().isEmpty() && addressEntity.getState() != null) {
 			if (!isValidPincode(addressEntity.getPincode())) {
