@@ -66,14 +66,14 @@ public class AddressDao {
     }
 
     /**
-     * This method is to get address of particular customer using customer id
+     * This method is to get address of particular customer using customer
      * @param customer whose address are to be fetched
      * @return addresses
      */
-
+    
     public List<CustomerAddressEntity> customerAddressByCustomer(CustomerEntity customer) {
         List<CustomerAddressEntity> addresses =
-                entityManager.createNamedQuery("customerAddressesByCustomerId", CustomerAddressEntity.class).setParameter("customer", customer)
+                entityManager.createNamedQuery("getAllCustomerAddressByCustomer", CustomerAddressEntity.class).setParameter("customer", customer)
                         .getResultList();
         if (addresses == null) {
             return Collections.emptyList();
