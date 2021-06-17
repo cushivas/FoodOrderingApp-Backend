@@ -45,7 +45,7 @@ public class AddressService {
 				&& !addressEntity.getLocality().isEmpty() && addressEntity.getCity() != null
 				&& !addressEntity.getCity().isEmpty() && addressEntity.getFlatBuildingNumber() != null
 				&& !addressEntity.getFlatBuildingNumber().isEmpty() && addressEntity.getPincode() != null
-				&& addressEntity.getPincode().isEmpty() && addressEntity.getState() != null) {
+				&& !addressEntity.getPincode().isEmpty() && addressEntity.getState() != null) {
 			if (!isValidPincode(addressEntity.getPincode())) {
 				throw new SaveAddressException("SAR-002", "Invalid pincode");
 			}
