@@ -41,13 +41,13 @@ public class CustomerAddressDao {
 
 	// To get Customer Address By Address if no results return null
 	public CustomerAddressEntity getCustomerAddressByAddress(AddressEntity addressEntity) {
-		try {
-			CustomerAddressEntity customerAddressEntity = entityManager
-					.createNamedQuery("getCustomerAddressByAddress", CustomerAddressEntity.class)
-					.setParameter("address_entity", addressEntity).getSingleResult();
-			return customerAddressEntity;
-		} catch (NoResultException nre) {
-			return null;
-		}
+	   try {
+	      CustomerAddressEntity customerAddressEntity = entityManager
+		    .createNamedQuery("getCustomerAddressByAddress", CustomerAddressEntity.class)
+		    .setParameter("address", addressEntity).getSingleResult();
+	      return customerAddressEntity;
+	   } catch (NoResultException nre) {
+	      return null;
+	   }
 	}
 }
